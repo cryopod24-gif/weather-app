@@ -6,31 +6,31 @@
     <title>Weather App</title>
     <style>
       :root {
-        --bg: #edf6ff;
+        --bg: #eef6ff;
         --bg-2: #dfeeff;
-        --panel: rgba(255, 255, 255, 0.82);
-        --card: #eff6ff;
+        --panel: rgba(255,255,255,0.82);
+        --card: #f3f8ff;
         --primary: #2563eb;
         --primary-dark: #1d4ed8;
         --text: #152033;
         --muted: #5d6b82;
-        --border: #dbe7ff;
-        --shadow: 0 18px 40px rgba(37, 99, 235, 0.15);
+        --border: #dce8ff;
+        --shadow: 0 18px 40px rgba(37,99,235,0.15);
         --button-text: #ffffff;
       }
 
       body.dark {
-        --bg: #111827;
-        --bg-2: #0f172a;
-        --panel: rgba(17, 24, 39, 0.84);
-        --card: #172334;
+        --bg: #0f172a;
+        --bg-2: #111827;
+        --panel: rgba(15,23,42,0.86);
+        --card: #162235;
         --primary: #60a5fa;
         --primary-dark: #3b82f6;
-        --text: #e5eefb;
+        --text: #ebf3ff;
         --muted: #b7c5dc;
-        --border: rgba(148, 163, 184, 0.26);
-        --shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
-        --button-text: #08111d;
+        --border: rgba(148,163,184,0.28);
+        --shadow: 0 18px 40px rgba(2,6,23,0.5);
+        --button-text: #061220;
       }
 
       * { box-sizing: border-box; }
@@ -47,7 +47,7 @@
         min-height: 100vh;
         display: grid;
         place-items: center;
-        padding: 24px 12px;
+        padding: 26px 12px;
       }
 
       .app {
@@ -55,7 +55,7 @@
         background: var(--panel);
         backdrop-filter: blur(10px);
         border: 1px solid var(--border);
-        border-radius: 24px;
+        border-radius: 26px;
         box-shadow: var(--shadow);
         padding: 22px 18px 18px;
       }
@@ -64,7 +64,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         margin-bottom: 18px;
       }
 
@@ -75,12 +75,12 @@
 
       .toggle {
         border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255,255,255,0.2);
         color: var(--text);
         border-radius: 999px;
-        padding: 8px 12px;
-        cursor: pointer;
+        padding: 8px 14px;
         font-weight: 700;
+        cursor: pointer;
       }
 
       .search-row {
@@ -96,25 +96,25 @@
 
       input {
         flex: 1;
+        padding: 14px 16px;
         border: 1px solid var(--border);
         background: rgba(255,255,255,0.5);
         color: var(--text);
-        padding: 14px 16px;
         outline: none;
       }
 
       input:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
       }
 
       button {
+        border: none;
         background: var(--primary);
         color: var(--button-text);
-        border: none;
         padding: 14px 18px;
-        cursor: pointer;
         font-weight: 700;
+        cursor: pointer;
         transition: transform 0.15s ease, background 0.2s ease;
       }
 
@@ -141,20 +141,20 @@
 
       .temp-row {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
         gap: 16px;
         margin: 14px 0 10px;
       }
 
       .temp {
         margin: 0;
-        font-size: clamp(2.8rem, 8vw, 4.2rem);
+        font-size: clamp(2.9rem, 8vw, 4.2rem);
         line-height: 1;
       }
 
       .icon {
-        font-size: clamp(2.5rem, 6vw, 4rem);
+        font-size: clamp(2.3rem, 6vw, 3.8rem);
       }
 
       .meta {
@@ -183,20 +183,23 @@
       }
 
       .status {
-        padding: 24px 10px;
+        padding: 28px 10px;
         text-align: center;
         color: var(--muted);
         font-size: 1.05rem;
       }
 
       @media (max-width: 480px) {
-        .temp-row {
+        .search-row {
           flex-direction: column;
+        }
+
+        .topbar {
           align-items: flex-start;
         }
 
-        .search-row {
-          flex-direction: column;
+        .toggle {
+          align-self: flex-end;
         }
 
         button {
@@ -256,17 +259,16 @@
         99: { label: 'Heavy thunderstorm with hail', icon: '⛈️' }
       };
 
-      const storedTheme = localStorage.getItem('weather-theme');
-      if (storedTheme === 'dark') {
+      const savedTheme = localStorage.getItem('weatherAppTheme');
+      if (savedTheme === 'dark') {
         document.body.classList.add('dark');
         themeToggle.textContent = 'Light mode';
       }
 
       themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        const dark = document.body.classList.contains('dark');
+        const dark = document.body.classList.toggle('dark');
         themeToggle.textContent = dark ? 'Light mode' : 'Dark mode';
-        localStorage.setItem('weather-theme', dark ? 'dark' : 'light');
+        localStorage.setItem('weatherAppTheme', dark ? 'dark' : 'light');
       });
 
       q.addEventListener('keydown', (event) => {
@@ -294,35 +296,34 @@
           }
 
           const cityData = geoData.results[0];
-
           const weatherResponse = await fetch(
             'https://api.open-meteo.com/v1/forecast?latitude=' +
-            cityData.latitude +
-            '&longitude=' +
-            cityData.longitude +
-            '&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code,time&timezone=auto&forecast_days=7'
+              cityData.latitude +
+              '&longitude=' +
+              cityData.longitude +
+              '&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code,time&timezone=auto&forecast_days=7'
           );
-
           const weatherData = await weatherResponse.json();
+
           const current = weatherData.current;
           const daily = weatherData.daily;
-          const currentCode = weatherCodes[current.weather_code] || { label: 'Weather', icon: '🌤️' };
+          const currentCondition = weatherCodes[current.weather_code] || { label: 'Weather', icon: '🌤️' };
 
           let html = '<div class="weather-card">';
           html += '<h2 class="city">' + cityData.name + ', ' + cityData.country + '</h2>';
           html += '<div class="temp-row">';
           html += '<div><h1 class="temp">' + current.temperature_2m + '&deg;C</h1></div>';
-          html += '<div class="icon" aria-label="' + currentCode.label + '">' + currentCode.icon + '</div>';
+          html += '<div class="icon" aria-label="' + currentCondition.label + '">' + currentCondition.icon + '</div>';
           html += '</div>';
-          html += '<p class="meta">' + currentCode.label + ' • Humidity: ' + current.relative_humidity_2m + '% • Wind: ' + current.wind_speed_10m + ' km/h</p>';
+          html += '<p class="meta">' + currentCondition.label + ' • Humidity: ' + current.relative_humidity_2m + '% • Wind: ' + current.wind_speed_10m + ' km/h</p>';
           html += '<h3>7-Day Forecast</h3>';
           html += '<div class="forecast">';
 
           for (let i = 0; i < 7; i++) {
-            const code = weatherCodes[daily.weather_code[i]] || { label: 'Weather', icon: '🌤️' };
+            const dailyCondition = weatherCodes[daily.weather_code[i]] || { icon: '🌤️' };
             html += '<div class="forecast-item">';
             html += '<span>' + daily.time[i] + '</span>';
-            html += '<span>' + code.icon + ' ' + daily.temperature_2m_min[i] + '&deg; - ' + daily.temperature_2m_max[i] + '&deg;C</span>';
+            html += '<span>' + dailyCondition.icon + ' ' + daily.temperature_2m_min[i] + '&deg; - ' + daily.temperature_2m_max[i] + '&deg;C</span>';
             html += '</div>';
           }
 
